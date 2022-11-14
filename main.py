@@ -4,11 +4,10 @@ from flask import Flask, request
 from flask_restful import Api, Resource
 from flask_jsonpify import jsonify
 from sqlalchemy import create_engine, text
-from json import dumps
 from sorcery import dict_of
 import operator, random, copy
 from os import path
-import os, sys, time, sqlite3
+import os, sys, time
 from supertech import Supertrip
 
 
@@ -29,7 +28,7 @@ class GraphVertex:
         return self.name < other.name
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 def by_distance(order):
     return order.get('distance')
@@ -55,7 +54,7 @@ for key in city_graph:
                                          (eval(adj3), adj3_distance)}})
             else:
                 city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance)}})
-
+logistics_office = thirty_seventh_and_fifth
 
 class Orders(Resource):
     def get(self):
@@ -64,9 +63,17 @@ class Orders(Resource):
             query = conn.execute(text("SELECT id, name, weight, value FROM orders"))
             for id, name, weight, value in query:
                 all_delivery_orders.append(
-                {'id': id, 'name': name, 'weight': int(weight), 'value': int(value), 'address': None, 'distance': None,
-                 'path': None})
-        return jsonify(all_delivery_orders)
+                {'id': id, 'name': name, 'weight': int(weight), 'value': int(value)})
+        todays_locations = list(city_graph.keys())
+        todays_locations.remove(logistics_office)
+        for order in all_delivery_orders:
+            dice = random.randint(0, len(todays_locations) - 1)
+            order['address'] = todays_locations.pop(dice)
+        orders_destinations = copy.deepcopy(all_delivery_orders)
+        for order in orders_destinations:
+            order['address'] = str(order['address'])
+
+        return jsonify(orders_destinations)
 
     def post(self):
         new_orders = request.get_json()
@@ -80,11 +87,15 @@ class Orders(Resource):
     def put(self):
         updated_order = request.get_json()
         with engine.connect() as conn:
-            for order in updated_order:
-                conn.execute(text("UPDATE orders SET name = '" + order.get("name") + "', weight = " + str(order.get("weight")) + \
-                                  ", value = " + str(order.get("value")) + " WHERE id = " + str(order.get("id")) + ";"))
-            conn.commit()
-        return updated_order
+            query = conn.execute(text("SELECT id FROM orders WHERE id = " + str(updated_order[0].get("id")) + ";"))
+            for id in query:
+                with engine.connect() as conn:
+                    for order in updated_order:
+                        conn.execute(text("UPDATE orders SET name = '" + order.get("name") + "', weight = " + str(order.get("weight")) + \
+                                            ", value = " + str(order.get("value")) + " WHERE id = " + str(order.get("id")) + ";"))
+                    conn.commit()
+                    return updated_order
+            return updated_order, 403
 
     def delete(self, id):
         with engine.connect() as conn:
@@ -95,7 +106,7 @@ class Orders(Resource):
 class Addresses(Resource):
     def get(self):
         with engine.connect() as conn:
-            query = conn.execute(text("SELECT name, coordinate_x, coordinate_y FROM addresses"))
+            query = conn.execute(text("SELECT id, name, coordinate_x, coordinate_y FROM addresses"))
             result = [dict(zip(tuple(query.keys()), i)) for i in query.cursor]
             return jsonify(result)
 
@@ -116,34 +127,26 @@ class LimitingFactor(Resource):
 class GetResults(Resource):
     def post(self):
         chosen_delivery_orders = request.get_json()
-        todays_locations = list(city_graph.keys())
-        logistics_office = thirty_seventh_and_fifth
-        todays_locations.remove(logistics_office)
-        for item in chosen_delivery_orders:
-            dice = random.randint(0, len(todays_locations) - 1)
-            item['address'] = todays_locations.pop(dice)
-
-        destinations = copy.deepcopy(chosen_delivery_orders)
-        for order in destinations:
-            order['address'] = order['address'].name
         new_trip = Supertrip(logistics_office, city_graph)
+        for order in chosen_delivery_orders:
+            order['address'] = eval(order['address'])
         distance_by_foot = 0
         distance_by_shortest = 0
         distance_by_direction = 0
         distance_by_super = 0
         final_path = []
-        # This calculates route after shortest distance from office.
-        # Often yields the weakest result. Uses A* once per order to calculate distance.
+        #This calculates distance for every order from the office and sorts ASC. Needed for the next method below.
         for order in chosen_delivery_orders:
             target, distance, path = new_trip.a_star(new_trip.map, logistics_office, order.get('address'))
             order['distance'] = distance
+            distance_by_foot += distance * 2
             order['path'] = path
         chosen_delivery_orders.sort(key=by_distance)
         chosen_delivery_orders.append({'name': 'Return to Base', 'weight': 0, 'value': 0, 'address': logistics_office,
                                        'distance': chosen_delivery_orders[-1].get('distance'), 'path': []})
-        for order in chosen_delivery_orders:
-            if order['name'] != 'Return to Base':
-                distance_by_foot += order['distance'] * 2
+
+        # This calculates route after shortest distance from office.
+        # Often yields the weakest result. Uses A* once per order to calculate distance.
         starting_location = new_trip.start
         for order in chosen_delivery_orders:
             target, distance, path = new_trip.a_star(new_trip.map, starting_location, order.get('address'))
@@ -240,13 +243,12 @@ class GetResults(Resource):
 
         # Optimizing finished. Calculating final distance.
         super_optimized_route.append({'name': 'Return to Base', 'weight': 0, 'value': 0, 'address': logistics_office,
-                                      'distance': chosen_delivery_orders[-1].get('distance'), 'path': []})
+                                      'distance': super_optimized_route[-1].get('distance'), 'path': []})
         starting_location = new_trip.start
         for order in super_optimized_route:
             target, distance, path = new_trip.a_star(new_trip.map, starting_location, order.get('address'))
             for address in path:
-                if address not in final_path:
-                    final_path.append(address)
+                final_path.append(address)
             starting_location = order.get('address')
             distance_by_super += distance
 
@@ -268,7 +270,8 @@ class GetResults(Resource):
             for row in result:
                 counter_super_best = row[0]
 
-        results = dict_of(destinations, distance_by_foot, distance_by_shortest, distance_by_direction, distance_by_super, final_path, program_runs, counter_super_best)
+        results = dict_of(distance_by_foot, distance_by_shortest, distance_by_direction, distance_by_super, final_path, program_runs, counter_super_best)
+        results['logistics_office'] = logistics_office.name
         return jsonify(results)
 
 api.add_resource(Orders, '/orders', '/orders/<id>')
