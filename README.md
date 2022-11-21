@@ -58,7 +58,7 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 * The distance_by_direction is sorted after direction. The program looks in the north direction first and then travels clockwise. Effective overall, but can unnecessarily move over empty areas in order to reach next delivery, and may have to go "back and forth" inside respective direction.
 * All routes return to base in the end and have that distance in consideration.
 
-## Can the 'Super Deliveries' method fail?
+## Can the 'Super Deliveries' method fail to provide the fastest route?
 Yes, it can. Sometimes, when the calculated orders are few, the 'clockwise' or the 'shortest by direction' method can get very favorable randomized addresses.
 If all addresses are in the same direction, the 'shortest by direction' method is tough to beat.
 Likewise, if the deliveries are in the North to South-East, the 'Super Deliveries' method gains no advantage over basic 'clockwise' sorting since they both skip the void areas (clockwise always looks in the North first) and the finding of the closest target can actually result in a longer distance traveled.
