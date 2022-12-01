@@ -48,10 +48,10 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 The program have unit tests implemented on the dynamic knapsack solution, the database connection and the A* search algorithm.
 
 # How does the 'Super Deliveries' method work?
-1) It starts with the direction proceeding a direction void of deliveries (if any). If all directions have deliveries, it starts with the direction with fewest deliveries. Then it travels clockwise.
-2) It targets the delivery address closest to current position, as long as that address is in the current direction.
-3) After delivering the last order in the current direction, it targets the closest delivery address in next clockwise direction, and then repeats the second stage. Unless there are no deliveries left.
-* Since the starting direction was proceeding one (or more) directions without deliveries (if any such existed), the route will skip as many empty areas as possible.
+1) It sorts the deliveries, starting with the direction proceeding a direction void of deliveries (if any). If all directions have deliveries, it starts with the direction with fewest deliveries. Then it travels clockwise on the delivery map.
+2) After each delivery, it chooses the next delivery address that is closest to current position, as long as that address is in the same direction.
+3) After delivering the last order in the current direction, it chooses the closest delivery address in next clockwise direction, and then repeats the second stage. Unless there are no deliveries left.
+* Since the starting direction was proceeding one (or more) directions without deliveries, if any such existed, the route will skip as many empty areas as possible.
 4) The route finally returns to base. 
 
 ## How is the distance calculated using the other methods?
