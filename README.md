@@ -45,6 +45,9 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 3) GET all addresses. Using the provided coordinates in each address you can populate a table (a 2D-map) of 4 rows and 10 columns of addresses. You now have a table of all addresses, and all destinations since each order have a delivery address attached to it.
 4) Get the final results by POSTING JSON of chosen orders to getResults. Update your table with the final path the program traveled.
 
+## Testing
+The program have unit tests implemented on the dynamic knapsack solution, the database connection and the A* search algorithm.
+
 # How does the 'Super Deliveries' method work?
 1) It starts with the direction proceeding a direction void of deliveries (if any). If all directions have deliveries, it starts with the direction with fewest deliveries. Then it travels clockwise.
 2) It targets the delivery address closest to current position, as long as that address is in the current direction.
@@ -54,7 +57,7 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 
 ## How is the distance calculated using the other methods?
 * The distance_by_foot is calculated by delivering the orders one by one, going back and forth from the logistics office.
-* The distance_by_shortest is sorted in ascending order, starting with the delivery closest to the office, and ending with the one furthest away. Very effective if they are all in the same direction. Very inefficient if not.
+* The distance_by_shortest is sorted in ascending order, starting with the delivery closest to the office, and ending with the one furthest away. Very effective if deliveries are all in the same direction. Very inefficient if not, as it produces a zig-zag delivery pattern.
 * The distance_by_direction is sorted after direction. The program looks in the north direction first and then travels clockwise. Effective overall, but can unnecessarily move over empty areas in order to reach next delivery, and may have to go "back and forth" inside respective direction.
 * All routes return to base in the end and have that distance in consideration.
 
@@ -81,10 +84,16 @@ When using default addresses and without changing the logistics office variable,
 * The orignal Super Deliveries with a GUI, shown below, was developed in 5 days, with around 8 hours of work each day. The API version is a rewrite and took a couple more days. Some additional hours have been spent finding and squashing bugs.
 
 * Future versions:
+
 It would be awesome indeed to load a zone from the Google Maps API have the program use that as its graph for and source of delivery addresses.
+
 More default orders in the db
+
 A fancy, polished front-end
-Adding the factor of storing orders while on the way to the logistics office, for a program more in accordance to JIT-delivery. Also the ability to add more than one driver and optimizing deliveries based on delivery zones.
+
+Adding the factor of storing orders while on the way to the logistics office, for a program more in accordance to JIT-delivery.
+
+The ability to add more than one driver and optimizing deliveries based on delivery zones.
 
 # An example of how a frontend of this can look
 The screenshot below is from the GUI version of Super Deliveries which is available in its own repository.
