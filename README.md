@@ -1,5 +1,5 @@
 # Super Deliveries API
-The goal of the program is to find the shortest possible delivery route for the highest valuable combination of orders. The progrram achieves this using the A* search algorithm, a dynamic knapsack solution and other logic. The user may:
+The goal of the program is to find the shortest possible delivery route for the highest valuable combination of orders. The program achieves this using the A* search algorithm, a dynamic knapsack solution and other logic. The user may:
 1) Add, update or delete a custom order to the database and get all existing orders and 40 addresses from the database.
 2) A unique, randomized delivery address is attached to each order. A graph is created from the addresses.
 3) Optional: Choose a weight limit, as if you were delivering by bicycle for example, and get the most valuable combination of orders that meets the weight requirement. This is done through a dynamic implementation of the knapsack solution that allows you to get not only a total value, but the order(s) the value come from. POST orders to evaluate and receive the most valuable orders.
