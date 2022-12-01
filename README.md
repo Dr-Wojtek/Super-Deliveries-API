@@ -53,6 +53,7 @@ The program have unit tests implemented on the dynamic knapsack solution, the da
 3) After delivering the last order in the current direction, it chooses the closest delivery address in next clockwise direction, and then repeats the second stage. Unless there are no deliveries left.
 * Since the starting direction was proceeding one (or more) directions without deliveries, if any such existed, the route will skip as many empty areas as possible.
 4) The route finally returns to base. 
+This produces a nice, circle-shaped route with few, if any, zig-zag patterns, in about 90% of the cases. See below for 'Can the SP method fail?'
 
 ## How is the distance calculated using the other methods?
 * The distance_by_foot is calculated by delivering the orders one by one, going back and forth from the logistics office.
