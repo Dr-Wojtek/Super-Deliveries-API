@@ -1,10 +1,9 @@
 # Super Deliveries API
-The goal of the program is using the A* search algorithm, a dynamic knapsack solution and custom logic to find the shortest possible delivery route for the highest valuable combination of orders. You may:
-1) Add, update or delete a custom order to the database and then get all existing orders and 40 addresses from the database. Then;
+The goal of the program is to find the shortest possible delivery route for the highest valuable combination of orders. The progrram achieves this using the A* search algorithm, a dynamic knapsack solution and other logic. The user may:
+1) Add, update or delete a custom order to the database and get all existing orders and 40 addresses from the database.
 2) A unique, randomized delivery address is attached to each order. A graph is created from the addresses.
-3) Optional: Choose a weight limit, as if you were delivering by bicycle for example, and get the most valuable combination of orders that meets the weight requirement. This is done through a dynamic implementation of the knapsack problem that allows you to get not only a total value, but the order(s) the value come from.
-4) Find the fastest route in the city to deliver the selected orders in one run.
-5) Have the route returned to you with its total distance, as well as the distance for other, simpler to calculate, delivery routes. Compare the distance; was the 'Super Deliveries' method the best?
+3) Optional: Choose a weight limit, as if you were delivering by bicycle for example, and get the most valuable combination of orders that meets the weight requirement. This is done through a dynamic implementation of the knapsack solution that allows you to get not only a total value, but the order(s) the value come from. POST orders to evaluate and receive the most valuable orders.
+4) POST your orders and have the fastest route returned to you with its total distance, as well as the distance for other, simpler to calculate, delivery routes. Compare the distances; was the 'Super Deliveries' method the best?
 
 ## Third-party libraries
 Super Deliveries uses the flask framework and SQLAlchemy. The following third-party library imports are made:
@@ -40,8 +39,8 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 * Counters for total times Super Deliveries provided the best, shortest route and total calculation runs.
 
 ## In practice:
-1) GET all orders. Add, update or delete any as you please.
-2) If you want, POST a JSON of the orders to the knapsack (limitingFactor) and have the most valuable combination returned that meets specified weight requirement.
+1) Add, update or delete any orders as you please, then GET all orders
+2) If you want, POST a JSON of the orders to the knapsack (limitingFactor endpoint) and have the most valuable combination returned that meets specified weight requirement.
 3) GET all addresses. Using the provided coordinates in each address you can populate a table (a 2D-map) of 4 rows and 10 columns of addresses. You now have a table of all addresses, and all destinations since each order have a delivery address attached to it.
 4) Get the final results by POSTING JSON of chosen orders to getResults. Update your table with the final path the program traveled.
 
@@ -81,7 +80,7 @@ When using default addresses and without changing the logistics office variable,
 
 * The dynamic knapsack solution not only saves a total value inside a 2d-array but a list of the orders this value came from. This is what allows the program to return a JSON with not just a maximum total value number for given weight, but the orders this value is derived from.
 
-* The orignal Super Deliveries with a GUI, shown below, was developed in 5 days, with around 8 hours of work each day. The API version is a rewrite and took a couple more days. Some additional hours have been spent finding and squashing bugs.
+* The orignal Super Deliveries with a GUI, shown below, was developed in 5 days. The API version is a rewrite and took a couple more days. Some additional hours have been spent finding and squashing bugs.
 
 * Future versions:
 
