@@ -2,8 +2,47 @@
 
 from math import inf
 from heapq import heappop, heappush
+from sqlalchemy import create_engine, text
 
-class Supertrip:
+engine = create_engine('sqlite:///db/SuperDeliveries.db', future=True)
+
+class GraphVertex:
+    def __init__(self, name, x, y, id):
+        self.name = name
+        self.pos = (x, y)
+        self.direction = ""
+        self.visit_number = []
+        self.id = id
+    # heappush needs to know which object is smaller according to heap rules.
+    # locations have no specified size, therefore implement less-than method which says, current location is smaller to whichever compared location:
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __str__(self):
+        return str(self.id)
+
+# Loading addresses and creating map graph
+city_graph = {}
+with engine.connect() as conn:
+    all_addresses = conn.execute(text("SELECT id, name, coordinate_x, coordinate_y FROM addresses"))
+    for id, name, x, y in all_addresses:
+        globals()[id] = GraphVertex(name, int(x), int(y), id)
+        city_graph.update({globals()[id] : None})
+
+for key in city_graph:
+    with engine.connect() as conn:
+        all_neighbors = conn.execute(text("SELECT adj1, adj1_distance, adj2, adj2_distance, adj3, adj3_distance, adj4, adj4_distance FROM addresses WHERE id = '" + key.id + "'"))
+        for adj1, adj1_distance, adj2, adj2_distance, adj3, adj3_distance, adj4, adj4_distance in all_neighbors:
+            if adj4 != "":
+                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance),
+                                         (eval(adj3), adj3_distance), (eval(adj4), adj4_distance)}})
+            elif adj3 != "":
+                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance),
+                                         (eval(adj3), adj3_distance)}})
+            else:
+                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance)}})
+
+class Supertech:
     def __init__(self, start_pos, map):
         self.start = start_pos
         self.map = map
@@ -96,7 +135,7 @@ class Supertrip:
                         for order in exclude_order:
                             matrix[i][j].append(order)
                 # And if the object is too heavy, it cannot be included, so we skip it
-                # by copying last rows most valuable config.
+                # by copying last row's most valuable config.
                 else:
                     matrix[i][j] = []
                     for order in matrix[i-1][j]:
@@ -132,7 +171,7 @@ class Supertrip:
                 if new_distance < paths_and_distances[adj][0]:
                     paths_and_distances[adj][0] = new_distance
                     paths_and_distances[adj][1] = new_path
-                    # push new room to calculate onto heap
-                    heappush(addresses_to_calculate, (new_distance, adj))
+                    # push new location and distance there onto heap
+                    heappush(addresses_to_calculate, (c_distance + extra_distance, adj))
 
         return t.name, paths_and_distances[t][0], paths_and_distances[t][1]

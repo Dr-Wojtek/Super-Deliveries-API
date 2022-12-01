@@ -8,52 +8,19 @@ from sorcery import dict_of
 import operator, random, copy
 from os import path
 import os, sys, time
-from supertech import Supertrip
-
+from supertech import *
 
 engine = create_engine('sqlite:///db/SuperDeliveries.db', future=True)
 app = Flask(__name__)
 api = Api(app)
 
-class GraphVertex:
-    def __init__(self, name, x, y, id):
-        self.name = name
-        self.pos = (x, y)
-        self.direction = ""
-        self.visit_number = []
-        self.id = id
-    # heappush needs to know which object is smaller according to heap rules.
-    # locations have no specified size, therefore implement less-than method which says, current location is smaller to whichever compared location:
-    def __lt__(self, other):
-        return self.name < other.name
-
-    def __str__(self):
-        return str(self.id)
-
 def by_distance(order):
     return order.get('distance')
+
 def by_direction(order):
     return order.get('address').direction
 
-city_graph = {}
-with engine.connect() as conn:
-    all_addresses = conn.execute(text("SELECT id, name, coordinate_x, coordinate_y FROM addresses"))
-    for id, name, x, y in all_addresses:
-        globals()[id] = GraphVertex(name, int(x), int(y), id)
-        city_graph.update({globals()[id] : None})
 
-for key in city_graph:
-    with engine.connect() as conn:
-        all_neighbors = conn.execute(text("SELECT adj1, adj1_distance, adj2, adj2_distance, adj3, adj3_distance, adj4, adj4_distance FROM addresses WHERE id = '" + key.id + "'"))
-        for adj1, adj1_distance, adj2, adj2_distance, adj3, adj3_distance, adj4, adj4_distance in all_neighbors:
-            if adj4 != "":
-                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance),
-                                         (eval(adj3), adj3_distance), (eval(adj4), adj4_distance)}})
-            elif adj3 != "":
-                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance),
-                                         (eval(adj3), adj3_distance)}})
-            else:
-                city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance)}})
 logistics_office = thirty_seventh_and_fifth
 
 class Orders(Resource):
@@ -115,7 +82,7 @@ class LimitingFactor(Resource):
         all_delivery_orders = request.get_json()
         chosen_delivery_orders = []
         if limiting_factor != 0:
-            items_to_deliver = Supertrip.dynamic_knapsack(all_delivery_orders, 'weight', int(limiting_factor))
+            items_to_deliver = Supertech.dynamic_knapsack(all_delivery_orders, 'weight', int(limiting_factor))
             for order in all_delivery_orders:
                 if order['name'] in items_to_deliver:
                     chosen_delivery_orders.append(order)
@@ -124,10 +91,10 @@ class LimitingFactor(Resource):
 
         return jsonify(chosen_delivery_orders)
 
-class GetResults(Resource):
+class CreateResults(Resource):
     def post(self):
         chosen_delivery_orders = request.get_json()
-        new_trip = Supertrip(logistics_office, city_graph)
+        new_trip = Supertech(logistics_office, city_graph)
         for order in chosen_delivery_orders:
             order['address'] = eval(order['address'])
         distance_by_foot = 0
@@ -154,7 +121,7 @@ class GetResults(Resource):
             distance_by_shortest += distance
 
         # This calculates route after direction.
-        # Often yields better result than by shortst distance from office; sometimes even the best. A* not needed.
+        # Often yields better result than by shortest distance from office; sometimes even the best. A* not needed.
         chosen_delivery_orders.pop(-1)
         optimized_route = chosen_delivery_orders.copy()
         optimized_route.sort(key=by_direction)
@@ -177,8 +144,8 @@ class GetResults(Resource):
                 if direction == order['address'].direction[3:5]:
                     number_per_direction[direction] += 1
                     break
-        # Sorting clockwise, starting with first direction after empty one(s).
-        # If no empty ones it starts with direction with least deliveries:
+        # Sorting clockwise, starting with first direction after empty directions(s).
+        # If no empty directions it starts with direction with the least deliveries:
         directions_asc = sorted(number_per_direction.items(), key=operator.itemgetter(1))
         first_direction = directions_asc[0][0]
         compass = ['N)', 'NE', 'E)', 'SE', 'S)', 'SW', 'W)', 'NW']
@@ -193,7 +160,8 @@ class GetResults(Resource):
             for delivery_order in optimized_route:
                 if delivery_order['address'].direction[3:5] == compass[i]:
                     super_optimized_route.append(delivery_order)
-        # Then it's time for A* to optimize within directions and then closest in next direction.
+
+        # Time for A* to optimize within direction and then to closest in next direction.
         # Uncomment print statements for verbose A* sorting.
         for i in range(len(super_optimized_route) - 1):
             if super_optimized_route[i]['address'] == logistics_office:
@@ -277,7 +245,7 @@ class GetResults(Resource):
 api.add_resource(Orders, '/orders', '/orders/<id>')
 api.add_resource(Addresses, '/addresses')
 api.add_resource(LimitingFactor, '/limitingFactor/<limiting_factor>')
-api.add_resource(GetResults, '/getResults')
+api.add_resource(CreateResults, '/createResults')
 
 if __name__ == '__main__':
     app.run(port='5002')
