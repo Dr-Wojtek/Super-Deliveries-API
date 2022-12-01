@@ -53,6 +53,7 @@ The program have unit tests implemented on the dynamic knapsack solution, the da
 3) After delivering the last order in the current direction, it chooses the closest delivery address in next clockwise direction, and then repeats the second stage. Unless there are no deliveries left.
 * Since the starting direction was proceeding one (or more) directions without deliveries, if any such existed, the route will skip as many empty areas as possible.
 4) The route finally returns to base. 
+
 This produces a nice, circle-shaped route with few, if any, zig-zag patterns, in about 90% of the cases. See below for 'Can the SP method fail?'
 
 ## How is the distance calculated using the other methods?
@@ -64,7 +65,9 @@ This produces a nice, circle-shaped route with few, if any, zig-zag patterns, in
 ## Can the 'Super Deliveries' method fail to provide the fastest route?
 Yes, it can. Sometimes, when the calculated orders are few, the 'clockwise' or the 'shortest by direction' method can get very favorable randomized addresses.
 If all addresses are in the same direction, the 'shortest by direction' method is tough to beat.
-Likewise, if the deliveries are in the North to South-East, the 'Super Deliveries' method gains no advantage over basic 'clockwise' sorting since they both skip the void areas (clockwise always looks in the North first) and the finding of the closest target can actually result in a longer distance traveled.
+Likewise, if the deliveries are in the North to South-East, the 'Super Deliveries' method gains no advantage over basic clockwise 'sorted by direction' since they both skip the void areas ('sorted by direction' always looks in the North first).
+
+The finding of the closest target can actually result in a longer distance traveled:
 
 Let's say the 'Super Deliveries' method is in the middle of the East district and starts targeting the next delivery.
 One of them is closer to the office than the other, but they are **equally far** from the current location.
