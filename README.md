@@ -31,7 +31,7 @@ Supports GET. Returns all rows with columns id, name, coordinate_x and coordinat
 Supports POST. 
 Requires JSON of all orders to be considered and POST to /limitingFactor/{factor}, with {factor} being the weight limit. For example, ~/limitingFactor/22 to set a weight limit of 22 kilos. Returns a new JSON with a combination of orders that in total meets the weight requirement and with the highest total value.
 
-### /getResults
+### /runTrip
 Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 * Calculated distances for all delivery methods. Compare them and see which one was best.
 * Location of the logistics office
