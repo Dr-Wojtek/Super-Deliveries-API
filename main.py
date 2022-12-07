@@ -91,7 +91,7 @@ class LimitingFactor(Resource):
 
         return jsonify(chosen_delivery_orders)
 
-class CreateResults(Resource):
+class RunTrip(Resource):
     def post(self):
         chosen_delivery_orders = request.get_json()
         new_trip = Supertech(logistics_office, city_graph)
@@ -245,7 +245,7 @@ class CreateResults(Resource):
 api.add_resource(Orders, '/orders', '/orders/<id>')
 api.add_resource(Addresses, '/addresses')
 api.add_resource(LimitingFactor, '/limitingFactor/<limiting_factor>')
-api.add_resource(CreateResults, '/createResults')
+api.add_resource(RunTrip, '/runTrip')
 
 if __name__ == '__main__':
     app.run(port='5002')
