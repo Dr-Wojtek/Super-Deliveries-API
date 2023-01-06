@@ -24,6 +24,9 @@ All CRUD operations; Create, Read, Update and Delete any order in the database.
 * PUTting requires a JSON with already existing id, name, weight and value parameters. Returns the same JSON and status 200 if id existed. Returns same JSON and status 403 if not.
 * Sending a DELETE requires no JSON - instead, **send the request to /orders/{id}** , {id} being the id of the order you'd have deleted. Returns null.
 
+### /resetOrders
+Send a DELETE request to /resetOrders and the database will wipe (truncate) the order table and re-populate it with default orders.
+
 ### /addresses
 Supports GET. Returns all rows with columns id, name, coordinate_x and coordinate_y from table 'addresses'.
 
@@ -80,26 +83,24 @@ On the other hand, if the next direction of orders would have been closer to the
 **Super Deliveries yields the best result in >80% of the time for few orders and 95% of the time for many orders.** When it misses, it only miss by a few kilometers compared to the winning method.
 
 ## Other
-* Behind the scenes, the program creates a graph of addresses from addresses in the database. Based on the coordinates of the address, every address is awarded a direction from current logistics office.
-When using default addresses and without changing the logistics office variable, the logistics office address is in the center of the "map".
+* Behind the scenes, the program creates a graph of addresses from addresses in the database. Based on the coordinates of the address, every address is awarded a direction from current logistics office. The logistics office address is in the center of the map.
 
 * The dynamic knapsack solution not only saves a total value inside a 2d-array but a list of the orders this value came from. This is what allows the program to return a JSON with not just a maximum total value number for given weight, but the orders this value is derived from.
 
-* The orignal Super Deliveries with a GUI, shown below, was developed in 5 days. The API version is a rewrite and took a couple more days. Some additional hours have been spent finding and squashing bugs.
+* The original Super Deliveries with a form of GUI in Terminal was developed in 5 days. The API version is a rewrite and took a couple more days. Some additional hours have been spent finding and squashing bugs.
 
 * Future versions:
 
-It would be awesome indeed to load a zone from the Google Maps API have the program use that as its graph for and source of delivery addresses.
+Load a zone from the Google Maps API and have the program use that as its graph/map and source of delivery addresses.
 
-More default orders in the db
+~~More default orders in the db~~ DONE
 
-A fancy, polished front-end
+~~A fancy, polished front-end~~ DONE, see below
 
 Adding the factor of storing orders while on the way to the logistics office, for a program more in accordance to JIT-delivery.
 
 The ability to add more than one driver and optimizing deliveries based on delivery zones.
 
 # An example of how a frontend of this can look
-The screenshot below is from the GUI version of Super Deliveries which is available in its own repository.
-The code is more polished in the API version, however for purposes where you want to render a 2D-map in terminal, feel free to dive into the code in the GUI version.
-![](https://user-images.githubusercontent.com/99674687/201478646-99ad7c86-9d85-4f3a-aa08-1b943c88dca2.png)
+The screenshot below is from http://www.alexstrae.nu
+![Super Deliveries v0.6](https://user-images.githubusercontent.com/99674687/210983570-b467158f-2a7f-42c4-ad44-c36345ae7c64.png)
