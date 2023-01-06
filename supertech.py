@@ -3,8 +3,10 @@
 from math import inf
 from heapq import heappop, heappush
 from sqlalchemy import create_engine, text
+from os import path
 
 engine = create_engine('sqlite:///db/SuperDeliveries.db', future=True)
+
 
 class GraphVertex:
     def __init__(self, name, x, y, id):
@@ -39,8 +41,11 @@ for key in city_graph:
             elif adj3 != "":
                 city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance),
                                          (eval(adj3), adj3_distance)}})
-            else:
+            elif adj2 != "":
                 city_graph.update({key: {(eval(adj1), adj1_distance), (eval(adj2), adj2_distance)}})
+
+            else:
+                city_graph.update({key: {(eval(adj1), adj1_distance)}})
 
 class Supertech:
     def __init__(self, start_pos, map):

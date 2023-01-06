@@ -1,0 +1,11 @@
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 1, 'Ravenclaws Diadem', NULL, 11560, 4);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 2, 'The Ocarina of Time', NULL, 4000, 2);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 3, 'Anduril', NULL, 20000, 6);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 4, 'Tarzans shorts', NULL, 3000, 1);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 5, 'Yodas shepherd pie', NULL, 10000, 3);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 6, 'Perevells bow', NULL, 15000, 5);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 7, 'George Lucas lightsaber', NULL, 17000, 5);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 8, 'Geralts Best Gwent cards', NULL, 5000, 1);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 9, 'Denethors wood and oil', NULL, 3000, 8);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 10, 'Ripleys flamethrower', NULL, 14000, 7);
+insert into `orders` (`address`, `distance`, `id`, `name`, `path`, `value`, `weight`) values (NULL, NULL, 11, 'Hagrids mustache tools', NULL, 2000, 3);

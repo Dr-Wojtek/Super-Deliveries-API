@@ -1,4 +1,4 @@
-# Code by Alex Stråe, Sweden, AKA Dr-Wojtek @ GitHub
+# Code by Alex Stråe, Sweden
 
 from flask import Flask, request
 from flask_restful import Api, Resource
@@ -9,9 +9,12 @@ import operator, random, copy
 from os import path
 import os, sys, time
 from supertech import *
+from flask_cors import CORS
 
-engine = create_engine('sqlite:///db/SuperDeliveries.db', future=True)
+
+engine = create_engine("sqlite:///db/SuperDeliveries.db", future=True)
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 def by_distance(order):
@@ -20,8 +23,7 @@ def by_distance(order):
 def by_direction(order):
     return order.get('address').direction
 
-
-logistics_office = thirty_seventh_and_fifth
+logistics_office = hornstull
 
 class Orders(Resource):
     def get(self):
@@ -46,9 +48,10 @@ class Orders(Resource):
         new_orders = request.get_json()
         with engine.connect() as conn:
             for order in new_orders:
-                conn.execute(text("INSERT INTO orders (id, name, weight, value) VALUES ("+ str(order.get("id")) + ", '"+ order.get("name") + "', " \
+                conn.execute(text("INSERT INTO orders (name, weight, value) VALUES ('"+ order.get("name") + "', " \
                               + str(order.get("weight")) + ", " + str(order.get("value")) +");"))
             conn.commit()
+
         return new_orders
 
     def put(self):
@@ -68,12 +71,33 @@ class Orders(Resource):
         with engine.connect() as conn:
             conn.execute(text("DELETE FROM orders WHERE id=" + str(id) + ""))
             conn.commit()
-        return
+        response = jsonify(success=True)
+        return response
+
+class ResetOrders(Resource):
+    def delete(self):
+        default_orders_file = open('super-deliveries_default-orders.sql', 'r')
+        sqlFile = default_orders_file.read()
+        default_orders_file.close()
+        sqlCommands = sqlFile.split(';')
+
+        with engine.connect() as conn:
+            conn.execute(text("DELETE FROM orders"))
+            conn.commit()
+            for command in sqlCommands:
+                try:
+                    conn.execute(text(command))
+                    conn.commit()
+                except OperationalError as msg:
+                    print("Command skipped: ", msg)
+        response = jsonify(success=True)
+        return response
 
 class Addresses(Resource):
     def get(self):
         with engine.connect() as conn:
-            query = conn.execute(text("SELECT id, name, coordinate_x, coordinate_y FROM addresses"))
+            query = conn.execute(text("SELECT id, name, coordinate_x, coordinate_y, adj1, adj2, adj3, adj4, "
+                                      "adj1_distance, adj2_distance, adj3_distance, adj4_distance FROM addresses"))
             result = [dict(zip(tuple(query.keys()), i)) for i in query.cursor]
             return jsonify(result)
 
@@ -133,7 +157,7 @@ class RunTrip(Resource):
             starting_location = order.get('address')
             distance_by_direction += distance
 
-        # This calculates route with Super Deliveries logic and A*, getting the closest next drop-off,
+        # This calculates route with 'Super Deliveries' logic and A*, getting the closest next drop-off,
         # as long as it is in the same direction from the office.
         optimized_route.pop(-1)
         super_optimized_route = []
@@ -144,7 +168,7 @@ class RunTrip(Resource):
                 if direction == order['address'].direction[3:5]:
                     number_per_direction[direction] += 1
                     break
-        # Sorting clockwise, starting with first direction after empty directions(s).
+        # Sorting clockwise, starting with first direction after empty direction    (s).
         # If no empty directions it starts with direction with the least deliveries:
         directions_asc = sorted(number_per_direction.items(), key=operator.itemgetter(1))
         first_direction = directions_asc[0][0]
@@ -245,7 +269,8 @@ class RunTrip(Resource):
 api.add_resource(Orders, '/orders', '/orders/<id>')
 api.add_resource(Addresses, '/addresses')
 api.add_resource(LimitingFactor, '/limitingFactor/<limiting_factor>')
-api.add_resource(RunTrip, '/runTrip')
+api.add_resource(RunTrip, '/getRoute')
+api.add_resource(ResetOrders, '/resetOrders')
 
 if __name__ == '__main__':
     app.run(port='5002')
