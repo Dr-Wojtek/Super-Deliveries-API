@@ -20,7 +20,7 @@ Super Deliveries is a RESTful application, meaning any end point can be called a
 All CRUD operations; Create, Read, Update and Delete any order in the database.
 * Sending a GET will return a JSON of all rows with columns id, name, weight, value and address in table orders.
 **IMPORTANT:** Every time you send a GET to /orders, the orders will have new, randomized delivery addresses in respective 'address' field.
-* POSTing requires a JSON with (unique) id, name, weight and value parameters. You can POST several orders in one go. Returns the same JSON.
+* POSTing requires a JSON with name, weight and value parameters. You can POST several orders in one go. A unique ID will be generated for them. Returns the same JSON.
 * PUTting requires a JSON with already existing id, name, weight and value parameters. Returns the same JSON and status 200 if id existed. Returns same JSON and status 403 if not.
 * Sending a DELETE requires no JSON - instead, **send the request to /orders/{id}** , {id} being the id of the order you'd have deleted. Returns null.
 
@@ -31,7 +31,7 @@ Supports GET. Returns all rows with columns id, name, coordinate_x and coordinat
 Supports POST. 
 Requires JSON of all orders to be considered and POST to /limitingFactor/{factor}, with {factor} being the weight limit. For example, ~/limitingFactor/22 to set a weight limit of 22 kilos. Returns a new JSON with a combination of orders that in total meets the weight requirement and with the highest total value.
 
-### /runTrip
+### /getRoute
 Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 * Calculated distances for all delivery methods. Compare them and see which one was best.
 * Location of the logistics office
@@ -60,7 +60,8 @@ This produces a nice, circle-shaped route with few, if any, zig-zag patterns, in
 * The distance_by_foot is calculated by delivering the orders one by one, going back and forth from the logistics office.
 * The distance_by_shortest is sorted in ascending order, starting with the delivery closest to the office, and ending with the one furthest away. Very effective if deliveries are all in the same direction. Very inefficient if not, as it produces a zig-zag delivery pattern.
 * The distance_by_direction is sorted after direction. The program looks in the north direction first and then travels clockwise. Effective overall, but can unnecessarily move over empty areas in order to reach next delivery, and may have to go "back and forth" inside respective direction.
-* All routes return to base in the end and have that distance in consideration.
+* All routes return to base in the end.
+* All routes use the A* algorithm to find the shortest path to the next order in the sorted list. The difference between methods is the way the list is sorted.
 
 ## Can the 'Super Deliveries' method fail to provide the fastest route?
 Yes, it can. Sometimes, when the calculated orders are few, the 'clockwise' or the 'shortest by direction' method can get very favorable randomized addresses.
