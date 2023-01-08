@@ -11,7 +11,7 @@ import os, sys, time
 from supertech import *
 from flask_cors import CORS
 
-
+dir_for_server = "sqlite:////home/alexstrae/mysite/"
 engine = create_engine("sqlite:///db/SuperDeliveries.db", future=True)
 app = Flask(__name__)
 CORS(app)
@@ -126,7 +126,7 @@ class RunTrip(Resource):
         distance_by_direction = 0
         distance_by_super = 0
         final_path = []
-        #This calculates distance for every order from the office and sorts ASC. Needed for the next method below.
+        #This calculates distance for every order from the office and sorts ASC. Needed for methods below.
         for order in chosen_delivery_orders:
             target, distance, path = new_trip.a_star(new_trip.map, logistics_office, order.get('address'))
             order['distance'] = distance
@@ -188,48 +188,43 @@ class RunTrip(Resource):
         # Time for A* to optimize within direction and then to closest in next direction.
         # Uncomment print statements for verbose A* sorting.
         for i in range(len(super_optimized_route) - 1):
-            if super_optimized_route[i]['address'] == logistics_office:
-                continue
             current_dir = super_optimized_route[i]['address'].direction[3:5]
-            if super_optimized_route[i + 1]['address'].direction[3:5] == current_dir:
-                current_distance_next = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
+            if super_optimized_route[i + 1]['address'].direction[3:5] == current_dir or i == 0:
+                original_next_address = super_optimized_route[i + 1]['address']
+                current_next_distance = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
                                                         super_optimized_route[i + 1]['address'])[1]
-                current_next_address = super_optimized_route[i + 1]
                 grab = None
-                for delivery_order in super_optimized_route:
+                for delivery_order in super_optimized_route[i+1:]:
                     if delivery_order['address'].direction[3:5] == current_dir:
-                        already_delivered_order = None
-                        if i > 0:
-                            already_delivered_order = super_optimized_route[i - 1]
-                        if delivery_order != super_optimized_route[
-                            i] and delivery_order != already_delivered_order and delivery_order != current_next_address:
-                            other_target_distance = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
+                        other_target_distance = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
                                                                     delivery_order['address'])[1]
-                            if other_target_distance < current_distance_next:
-                                current_distance_next = other_target_distance
-                                grab = delivery_order
+                        if other_target_distance < current_next_distance:
+                            current_next_distance = other_target_distance
+                            grab = delivery_order
                 if grab:
-                    # print("FOUND CLOSER TARGET WITHIN DIRECTION")
-                    # print("PUTTING " + grab['name'] + " AFTER " + super_optimized_route[i]['name'] )
+                    print("Current location is " + super_optimized_route[i]['address'].name)
+                    print("FOUND CLOSER TARGET WITHIN SAME DIRECTION. " + grab['address'].name + " is closer than " + original_next_address.name + ".")
+                    print("PUTTING " + grab['name'] + " AFTER " + super_optimized_route[i]['name'] )
                     super_optimized_route.remove(grab)
                     super_optimized_route.insert(i + 1, grab)
 
             elif super_optimized_route[i]['address'].direction[3:5] != super_optimized_route[i + 1][
                                                                            'address'].direction[3:5]:
                 next_dir = super_optimized_route[i + 1]['address'].direction[3:5]
-                current_distance_next = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
+                original_next_address = super_optimized_route[i + 1]['address']
+                current_next_distance = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'],
                                                         super_optimized_route[i + 1]['address'])[1]
                 grab = None
-                for delivery_order in super_optimized_route:
+                for delivery_order in super_optimized_route[i:]:
                     if delivery_order['address'].direction[3:5] == next_dir:
-                        other_target_distance = \
-                        new_trip.a_star(new_trip.map, super_optimized_route[i]['address'], delivery_order['address'])[1]
-                        if other_target_distance < current_distance_next:
-                            current_distance_next = other_target_distance
+                        other_target_distance = new_trip.a_star(new_trip.map, super_optimized_route[i]['address'], delivery_order['address'])[1]
+                        if other_target_distance < current_next_distance:
+                            current_next_distance = other_target_distance
                             grab = delivery_order
                 if grab:
-                    # print("FOUND CLOSER TARGET FOR NEXT DIRECTION")
-                    # print("PUTTING " + grab['name'] + " AFTER " + super_optimized_route[i]['name'])
+                    print("Current location is " + super_optimized_route[i]['address'].name)
+                    print("FOUND CLOSER TARGET FOR NEXT DIRECTION. " + grab['address'].name + " is closer than " + original_next_address.name + ".")
+                    print("PUTTING " + grab['name'] + " AFTER " + super_optimized_route[i]['name'])
                     super_optimized_route.remove(grab)
                     super_optimized_route.insert(i + 1, grab)
 
