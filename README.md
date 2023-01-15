@@ -45,7 +45,7 @@ Supports POST. Requires JSON of orders to calculate. Returns new JSON with:
 1) Add, update or delete any orders as you please, then GET all orders
 2) If you want, POST a JSON of the orders to the knapsack (limitingFactor endpoint) and have the most valuable combination returned that meets specified weight requirement.
 3) GET all addresses. Using the provided coordinates in each address you can populate a table (a 2D-map) of 4 rows and 10 columns of addresses. You now have a table of all addresses, and all destinations since each order have a delivery address attached to it.
-4) Get the final results by POSTING JSON of chosen orders to getResults. Update your table with the final path the program traveled.
+4) Get the final results by POSTING JSON of chosen orders to getRoute. Update your table with the final path the program traveled.
 
 ## Testing
 The program have unit tests implemented on the dynamic knapsack solution, the database connection and the A* search algorithm.
