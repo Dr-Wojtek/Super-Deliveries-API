@@ -14,7 +14,7 @@ Super Deliveries uses the flask framework and SQLAlchemy. The following third-pa
 * `from sorcery import dict_of`
 
 ## End points
-Super Deliveries is a RESTful application, meaning any end point can be called at any time, as long as the appropriate data is fed. These end points are available:
+Super Deliveries is a REST application. These end points are available:
 
 ### /orders
 All CRUD operations; Create, Read, Update and Delete any order in the database.
