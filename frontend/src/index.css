@@ -1,0 +1,197 @@
+body {
+  font-family: Helvetica, sans-serif;
+
+}
+
+p.about {
+  font-size: 0.7em;
+  padding: 0px;
+  margin: 3px;
+}
+hr {
+  margin: auto;
+  width: 100%;
+}
+div.center {
+  width:100%;
+  text-align : center;
+  align-content: center;
+  justify-content: center;
+}
+
+h1.title {
+  font-size: 3.1em;
+  margin:auto;
+}
+
+p.title {
+  margin:auto;
+  font-size: 1.6em;
+}
+
+span.red {
+  color: red;
+}
+
+span.yellow {
+  background-color: yellow;
+  color: black;
+}
+
+span.green {
+  background-color: rgb(4, 255, 4);
+  color: black;
+}
+
+span.super {
+  color: goldenrod;
+}
+
+div.title {
+  padding: 5px;
+  margin:auto; 
+  width:700px; 
+  display: flex;
+  flex-wrap: wrap;
+}
+
+div.actions {
+  padding:10px;
+  padding-left: 80px;
+  margin: auto; 
+  width: 700px; 
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+div.orders {
+  padding:10px;
+  margin:auto; 
+  width: 700px; 
+  display: flex;
+  flex-wrap: wrap;
+}
+
+div.map {
+  padding:10px;
+  margin:auto; 
+  display: flex;
+  flex-wrap: wrap;
+}
+
+div.info {
+  padding: 10px;
+  margin:auto; 
+  width:800px; 
+  display: flex;
+  flex-wrap: wrap;
+}
+
+button {
+  padding:10px;
+}
+
+table.orders {
+  margin:auto;
+  table-layout: auto;
+  height: 100%;
+  width: 650px;
+  text-align: center;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  border-collapse: collapse;
+  box-shadow:0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.orders thead tr {
+  background-color: #0457d3;
+    color: #ffffff;
+    text-align: center;
+}
+.orders th, .orders td{
+  padding: 4px 4px;
+  width: auto;
+  
+}
+.orders tbody tr {
+  border-bottom: thin solid #dddddd;
+  
+}
+.orders tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+.orders  tbody tr:last-of-type {
+  border-bottom: thin solid #0346cd;
+}
+
+table.addresses {
+  margin:auto; 
+  table-layout: fixed;
+  width: 850px;
+  height: 400px;
+  text-align: center;
+  font-family: Helvetica, sans-serif;
+  border: solid thin rgb(146, 146, 146);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  border-spacing: 0;
+  border-collapse: separate;
+  overflow: hidden;
+}
+
+.addresses p {
+  padding: 2px;
+  margin: 1px;
+}
+
+p.stop {
+  color: red;
+  font-size: 0.9em;
+}
+
+p.order {
+  font-size: 0.6em;
+}
+
+p.address {
+  font-size: 0.9em;
+}
+
+table.info {
+  margin:auto; 
+  table-layout: auto;
+  height: 100px;
+  width: 600px;
+  text-align: center;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  border-collapse: collapse;
+  box-shadow:0 0 20px rgba(0, 0, 0, 0.15);
+}
+.info thead tr {
+  background-color: #03bc09;
+    color: #ffffff;
+    text-align: center;
+}
+.info th, .info td {
+  padding: 4px 4px;
+  width: auto;
+}
+.info tbody tr {
+  border-bottom: thin solid #dddddd;
+}
+.info tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+.info  tbody tr:last-of-type {
+  border-bottom: thin solid #00982b;
+}
+
+.info p {
+  padding: 10px;
+  margin: auto;
+}
+ul, li {
+  padding: 5px;
+  margin: auto;
+}
