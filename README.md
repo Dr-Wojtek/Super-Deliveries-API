@@ -1,3 +1,7 @@
+![Super Deliveries v0.6](https://user-images.githubusercontent.com/99674687/210983570-b467158f-2a7f-42c4-ad44-c36345ae7c64.png)
+The project was deployed at Heroku and active on http://www.alexstrae.nu until april 2023. 
+The code is available in /frontend. Super Deliveries was my very first React project, written in 2022, and contains some subpar solutions like setTimeout instead of useEffect's dependency array. I'm still fond of it and for the time being I want to keep it as it is, as it reminds me of how I have improved since.
+
 # Super Deliveries API
 The goal of the program is to find the shortest possible delivery route for the highest valuable combination of orders. The program achieves this using the A* search algorithm, a dynamic knapsack solution and other logic. The user may:
 1) Add, update or delete a custom order to the database and get all existing orders and 40 addresses from the database.
@@ -100,7 +104,3 @@ Load a zone from the Google Maps API and have the program use that as its graph/
 Adding the factor of storing orders while on the way to the logistics office, for a program more in accordance to JIT-delivery.
 
 The ability to add more than one driver and optimizing deliveries based on delivery zones.
-
-# An example of how a frontend of this can look
-The screenshot below is from http://www.alexstrae.nu
-![Super Deliveries v0.6](https://user-images.githubusercontent.com/99674687/210983570-b467158f-2a7f-42c4-ad44-c36345ae7c64.png)
